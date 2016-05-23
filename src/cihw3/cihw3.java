@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import cihw3.Canvas;
-import cihw3.Gene;
+import cihw3.Particle;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -42,14 +42,14 @@ public class cihw3 extends Application {
 	
 	private int looptimes;
 	private int groupSize;
-	private double crossoverProb;
-	private double mutationProb;	
+	private double phiIProb;
+	private double phiGProb;	
 	private double errorLimit;
 
 	private double[] parameters;
 	
 	private int iteration;
-	private GenePool genePool;
+	private Swarm particleSwarm;
 		
 	private int drawAcelerate = 100;
 	
@@ -59,9 +59,9 @@ public class cihw3 extends Application {
 	private Label line3Dist = new Label("Green");
 	private Label angleInfo = new Label("");
 
-	private ArrayList<Gene> bestGeneArray;
+	private ArrayList<Particle> bestParticleArray;
 	private double bstGeneArrayFitness = Double.MAX_VALUE;
-	private double bestGeneArrayAvgError = Double.MAX_VALUE;
+	private double bestParticleArrayAvgError = Double.MAX_VALUE;
 
 	private int finalFlag = 0;
     private ProgressIndicator pi;
@@ -77,7 +77,7 @@ public class cihw3 extends Application {
 		inputArray = new ArrayList<double[]>();
 		canvasPane = new Canvas();
 		car = new Car(this.canvasPane);
-		bestGeneArray = new ArrayList<Gene>();
+		bestParticleArray = new ArrayList<Particle>();
 
 		BorderPane ciPane = new BorderPane();
 		VBox infoBox = new VBox(10);
@@ -86,15 +86,15 @@ public class cihw3 extends Application {
 		Button go = new Button("Go");
 		Label looptimesLabel = new Label("Looptimes :");
 		Label groupSizeLabel = new Label("Group size :");
-		Label crossoverProbLabel = new Label("Crossover Probability");
-		Label mutationProbLabel = new Label("Mutation Probability");
+		Label phiIProbLabel = new Label("phiI Probability");
+		Label phiGProbLabel = new Label("phiG Probability");
 		Label errorLimitLabel = new Label("Error Limit");
 
-		TextField looptimesText = new TextField("200");
+		TextField looptimesText = new TextField("300");
 		TextField groupSizeText = new TextField("500");
-		TextField crossoverProbText = new TextField("0.6");
-		TextField mutationProbText = new TextField("0.2");
-		TextField errorLimitText = new TextField("1.5");
+		TextField phiIProbText = new TextField("0.3");
+		TextField phiGProbText = new TextField("0.7");
+		TextField errorLimitText = new TextField("1.2");
 
 		infoBox.setPadding(new Insets(15, 50, 15, 15));
 		canvasPane.getChildren().add(car);
@@ -116,8 +116,8 @@ public class cihw3 extends Application {
 
 		ciPane.setRight(canvasPane);
 		ciPane.setLeft(infoBox);
-		infoBox.getChildren().addAll(looptimesLabel, looptimesText, groupSizeLabel, groupSizeText, crossoverProbLabel,
-				crossoverProbText, mutationProbLabel, mutationProbText,errorLimitLabel,errorLimitText, loadFile, start, go, initialAngleSign, slider,
+		infoBox.getChildren().addAll(looptimesLabel, looptimesText, groupSizeLabel, groupSizeText, phiIProbLabel,
+				phiIProbText, phiGProbLabel, phiGProbText,errorLimitLabel,errorLimitText, loadFile, start, go, initialAngleSign, slider,
 				initialAngle, line3Dist, line1Dist, line2Dist, angleInfo,pi);
 
 		
@@ -166,23 +166,23 @@ public class cihw3 extends Application {
 
 		    	while(true){
 		    		
-		    		genePool.startAlgo(iteration);
+		    		particleSwarm.startAlgo(iteration);
 
-					double afterAlgoFitness = genePool.getAfterAlgoFitness();
-					double afterAlgoAvgError = genePool.getAfterAlgoAvgError();
+					double afterAlgoFitness = particleSwarm.getAfterAlgoFitness();
+					double afterAlgoAvgError = particleSwarm.getAfterAlgoAvgError();
 
 					// one ast
-					if (afterAlgoAvgError < bestGeneArrayAvgError) {
-						bestGeneArray.add(genePool.getBestGene());
-						bstGeneArrayFitness = bestGeneArray.get(bestGeneArray.size() - 1).getFitnessValue();
-						bestGeneArrayAvgError = bestGeneArray.get(bestGeneArray.size() - 1).getAvgError();
+					if (afterAlgoAvgError < bestParticleArrayAvgError) {
+						bestParticleArray.add(particleSwarm.getBestGene());
+						bstGeneArrayFitness = bestParticleArray.get(bestParticleArray.size() - 1).getFitnessValue();
+						bestParticleArrayAvgError = bestParticleArray.get(bestParticleArray.size() - 1).getAvgError();
 					}
 
 
 					String debug = "Iteration : "+iteration+
 							"\nAfter Algo Avg Error : "+(double) Math.round(afterAlgoAvgError * 1000) / 1000+
 							"\nAfter Algo Fitness : "+(double) Math.round(afterAlgoFitness * 1000) / 1000+
-							"\nNow Best Gene Avg Error : "+bestGeneArrayAvgError+
+							"\nNow Best Gene Avg Error : "+bestParticleArrayAvgError+
 							"\nNow Best Gene Fitness : "+bstGeneArrayFitness;
 					System.out.println(debug);
 					System.out.println("-------------------------------------");
@@ -193,7 +193,7 @@ public class cihw3 extends Application {
 				        updateProgress(iteration, looptimes);
 						break;
 					}
-					if (bestGeneArrayAvgError < errorLimit) {
+					if (bestParticleArrayAvgError < errorLimit) {
 						System.out.println("good error break");
 						iteration = looptimes;
 				        updateProgress(iteration, looptimes);
@@ -215,17 +215,17 @@ public class cihw3 extends Application {
 			
 			this.looptimes = Integer.parseInt(looptimesText.getText());
 			this.groupSize = Integer.parseInt(groupSizeText.getText());
-			this.crossoverProb = Double.parseDouble(crossoverProbText.getText());
-			this.mutationProb = Double.parseDouble(mutationProbText.getText());
+			this.phiIProb = Double.parseDouble(phiIProbText.getText());
+			this.phiGProb = Double.parseDouble(phiGProbText.getText());
 			this.errorLimit = Double.parseDouble(errorLimitText.getText());
 
 			this.parameters = new double[4];
 			this.parameters[0] = this.looptimes;
 			this.parameters[1] = this.groupSize;
-			this.parameters[2] = this.crossoverProb;
-			this.parameters[3] = this.mutationProb;
+			this.parameters[2] = this.phiIProb;
+			this.parameters[3] = this.phiGProb;
 			
-			this.genePool = new GenePool(this.parameters,this.inputArray);
+			this.particleSwarm = new Swarm(this.parameters,this.inputArray);
 						
 			new Thread(algo).start();			
 
@@ -246,7 +246,7 @@ public class cihw3 extends Application {
 							@Override
 							public void run() {
 								
-								printCurrentThread();
+//								printCurrentThread();
 								
 								if(finalFlag == 1){
 									line1Dist.setText("done");
@@ -258,7 +258,7 @@ public class cihw3 extends Application {
 									sensorLine3.setVisible(false);
 								}
 								else{
-									car.tuneCar(canvasPane, bestGeneArray.get(bestGeneArray.size() - 1));
+									car.tuneCar(canvasPane, bestParticleArray.get(bestParticleArray.size() - 1));
 									initialSetSensorsLine();
 								}
 							}

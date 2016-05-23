@@ -46,7 +46,7 @@ public class Car extends Circle {
 
 	}
 
-	public void tuneCar(Canvas canvasPane, Gene bestGene) {
+	public void tuneCar(Canvas canvasPane, Particle bestGene) {
 
 		// Calculate turn angle
 
@@ -54,11 +54,11 @@ public class Car extends Circle {
 				(this.sensor2.getDist()) ,
 				(this.sensor3.getDist())};
 		
-//		for(int i=0;i<distance.length;i++){
-//			if(distance[i] > 30){
-//				distance[i] = 30;
-//			}
-//		}
+		for(int i=0;i<distance.length;i++){
+			if(distance[i] > 30){
+				distance[i] = 30;
+			}
+		}
 		
 		if (startFlag != 0) {
 			double output = bestGene.calOutput(distance);
