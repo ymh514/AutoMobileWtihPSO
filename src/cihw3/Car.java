@@ -46,7 +46,7 @@ public class Car extends Circle {
 
 	}
 
-	public void tuneCar(Canvas canvasPane, Particle bestGene) {
+	public void tuneCar(Canvas canvasPane, Particle bestParticle) {
 
 		// Calculate turn angle
 
@@ -55,13 +55,13 @@ public class Car extends Circle {
 				(this.sensor3.getDist())};
 		
 		for(int i=0;i<distance.length;i++){
-			if(distance[i] > 30){
-				distance[i] = 30;
+			if(distance[i] > 33){
+				distance[i] = 33;
 			}
 		}
 		
 		if (startFlag != 0) {
-			double output = bestGene.calOutput(distance);
+			double output = bestParticle.calOutput(distance);
 //			System.out.println("output :"+output);
 			turnAngle = output;
 		} else {
@@ -82,10 +82,6 @@ public class Car extends Circle {
 		count++;
 
 		//
-		System.out.println(" left : " + distance[2] + " middle :" + distance[0] + " right : " + distance[1]);
-		System.out.println("turnAngle : "+turnAngle);
-		System.out.println( " now's Angle :"+angle);
-		System.out.println("==========================================");
 
 		
 //		 turnAngle = fuzzy.getTurnAngle();
@@ -101,6 +97,11 @@ public class Car extends Circle {
 
 		// Calculate angle with x-axis
 		angle = angle - (180 / Math.PI) * Math.asin((2 * Math.sin(Math.toRadians(-1*turnAngle)) / (6)));
+		System.out.println(" left : " + distance[2] + " middle :" + distance[0] + " right : " + distance[1]);
+		System.out.println("turnAngle : "+turnAngle);
+		System.out.println( " now's Angle :"+angle);
+		System.out.println("==========================================");
+
 //		if (angle < 0) {
 //			angle += 360;
 //		}
@@ -117,7 +118,6 @@ public class Car extends Circle {
 		r1.setRadius(3);
 		r1.setStroke(Color.DARKGRAY);
 		r1.setFill(Color.RED);
-//		canvasPane.getChildren().add(r1);
 
 		double angleForS2 = angle-45;
 //		if(angleForS2 >360){
@@ -131,7 +131,6 @@ public class Car extends Circle {
 		r2.setRadius(3);
 		r2.setStroke(Color.DARKGRAY);
 		r2.setFill(Color.BLUE);
-//		canvasPane.getChildren().add(r2);
 
 		double angleForS3 = angle+45;
 //		if(angleForS3 <0){
@@ -145,6 +144,10 @@ public class Car extends Circle {
 		r3.setRadius(3);
 		r3.setStroke(Color.DARKGRAY);
 		r3.setFill(Color.GREEN);
+
+		
+//		canvasPane.getChildren().add(r1);
+//		canvasPane.getChildren().add(r2);
 //		canvasPane.getChildren().add(r3);
 
 		

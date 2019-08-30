@@ -90,8 +90,8 @@ public class cihw3 extends Application {
 		Label phiGProbLabel = new Label("phiG Probability");
 		Label errorLimitLabel = new Label("Error Limit");
 
-		TextField looptimesText = new TextField("300");
-		TextField groupSizeText = new TextField("500");
+		TextField looptimesText = new TextField("1000");
+		TextField groupSizeText = new TextField("200");
 		TextField phiIProbText = new TextField("0.3");
 		TextField phiGProbText = new TextField("0.7");
 		TextField errorLimitText = new TextField("1.2");
